@@ -13,6 +13,7 @@ if not cap.isOpened():
     exit()
 
 while True:
+    # cap.set(cv.CAP_PROP_FPS,5)
     ret, frame = cap.read()
 
     if not ret:
@@ -27,7 +28,7 @@ while True:
     width  = cap.get(cv.CAP_PROP_FRAME_WIDTH)
     height = cap.get(cv.CAP_PROP_FRAME_HEIGHT) 
 
-    target_sizes = torch.tensor([(width, height)[::-1]])
+    target_sizes = torch.tensor([(height, width)])
     results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.9)[0]
     for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
         box = [round(i) for i in box.tolist()]

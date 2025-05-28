@@ -43,3 +43,6 @@ async def video_stream():
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
     
+@router.get('/status')
+async def get_cam_status():
+    return {'is_active': manager.get_status()}
