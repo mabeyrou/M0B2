@@ -1,6 +1,5 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer
 
-st.title("OpenCV Filters on Video Stream")
+st.title('Live Objet Recognition App')
 
 webrtc_streamer(key="streamer", sendback_audio=False)
