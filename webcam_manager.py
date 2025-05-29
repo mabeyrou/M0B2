@@ -89,7 +89,9 @@ class WebcamManager:
                     box = [round(i) for i in box.tolist()]
                     cv.rectangle(gray_frame, (box[0], box[1]), (box[2], box[3]), color=(255,0,0), thickness=2)
                     label_name = self.detection_service.get_label_name(label.item())
-                    cv.putText(gray_frame, label_name, (box[0], box[1] - 10), fontFace=cv.FONT_HERSHEY_SIMPLEX, 
+                    rounded_score = round(score.item(),3)
+                    text = f'{label_name} ({rounded_score})'
+                    cv.putText(gray_frame, text, (box[0], box[1] - 10), fontFace=cv.FONT_HERSHEY_SIMPLEX, 
                             fontScale=0.5, color=(255,0,0), thickness=1)
 
             ret, buffer = cv.imencode('.jpg', gray_frame, [cv.IMWRITE_JPEG_QUALITY, 70])

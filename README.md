@@ -28,8 +28,8 @@ uvicorn main:app --host 127.0.0.1 --port 9000 --reload
 ```bash
 streamlit run app.py
 ```
-
-Optimiser les FPS pour communication avec l'API ( 5 FPS),
-Intégrer le image to text pour avoir une description, bouton qui prend une photo et donne la description,
-Intègre la journalisation (loguru) + pytest  (BONUS),
-Remplacer le resnet par Yolo11 (BONUS)
+## TODO
+- [x] Optimiser les FPS pour communication avec l'API ( 5 FPS),
+- [ ] Intégrer le image to text pour avoir une description, bouton qui prend une photo et donne la description,
+- [x] Intègre la journalisation (loguru) + pytest  (BONUS),
+- [ ] Remplacer le resnet par Yolo11 (BONUS)
