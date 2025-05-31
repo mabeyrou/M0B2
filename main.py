@@ -7,7 +7,7 @@ app.include_router(webcam_routes)
 
 logger.remove()
 
-logger.add("logs/dev_{time}.log",
+logger.add("logs/dev_api.log",
           rotation="10 MB",
           retention="7 days",
           compression="zip",

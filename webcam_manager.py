@@ -2,6 +2,7 @@ import threading
 import cv2 as cv
 import torch
 from detection_service import DetectionService
+from loguru import logger
 
 class WebcamError(Exception):
     """Base class for webcam related exceptions."""
@@ -45,7 +46,9 @@ class WebcamManager:
             self.cap.set(cv.CAP_PROP_FPS,5) 
 
             if not self.cap.isOpened():
-                raise WebcamNotAvailableError('Unable to access the camera.')
+                error = 'Unable to access the camera.'
+                logger.error(error)
+                raise WebcamNotAvailableError(error)
             
             self.is_active = True
             self.frame_count = 0
@@ -65,13 +68,17 @@ class WebcamManager:
         
     def get_frame(self):
         if not self.is_active or self.cap is None:
-            raise WebcamNotAvailableError('The camera seems inactive. Exiting ...')
+            error = 'The camera seems inactive. Exiting ...'
+            logger.error(error)
+            raise WebcamNotAvailableError(error)
         
         with self.lock:
             success, frame = self.cap.read()
 
             if not success:
-                raise WebcamError("Can't receive frame (stream end?). Exiting ...")
+                error = "Can't receive frame (stream end?). Exiting ..."
+                logger.error(error)
+                raise WebcamError(error)
 
             self.frame_count += 1
         
@@ -85,14 +92,18 @@ class WebcamManager:
                 self.last_results = self.detection_service.detect_objects(frame, target_sizes)
 
             if self.last_results:
-                for score, label, box in zip(self.last_results["scores"], self.last_results["labels"], self.last_results["boxes"]):
-                    box = [round(i) for i in box.tolist()]
-                    cv.rectangle(gray_frame, (box[0], box[1]), (box[2], box[3]), color=(255,0,0), thickness=2)
-                    label_name = self.detection_service.get_label_name(label.item())
-                    rounded_score = round(score.item(),3)
-                    text = f'{label_name} ({rounded_score})'
-                    cv.putText(gray_frame, text, (box[0], box[1] - 10), fontFace=cv.FONT_HERSHEY_SIMPLEX, 
-                            fontScale=0.5, color=(255,0,0), thickness=1)
+                for result in self.last_results:
+                    logger.debug(result)
+                    box = result['box']
+                    label = result['label']
+                    score = result['score']
+                    cv.rectangle(gray_frame, (box[0], box[1]), 
+                                 (box[2], box[3]), 
+                                 color=(255,0,0), thickness=2)
+                    text = f'{label} ({score})'
+                    cv.putText(gray_frame, text, (box[0], box[1] - 10), 
+                               fontFace=cv.FONT_HERSHEY_SIMPLEX, 
+                               fontScale=0.5, color=(255,0,0), thickness=1)
 
             ret, buffer = cv.imencode('.jpg', gray_frame, [cv.IMWRITE_JPEG_QUALITY, 70])
             if ret:
@@ -108,8 +119,11 @@ class WebcamManager:
                     yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                 else:
-                    raise WebcamFrameError('No frame.')
+                    error = 'No frame.'
+                    logger.error(error)
+                    raise WebcamFrameError(error)
         except Exception as error:
+            logger.error(str(error))
             raise WebcamStreamError(str(error))
         
     def get_status(self) -> bool:
