@@ -34,5 +34,7 @@ def main():
         st.empty()
         st.button(label='▶️ Start', on_click=lambda:start_cam())
 
+    # st.camera_input(label="test")
+
 if __name__ == "__main__":
     main()

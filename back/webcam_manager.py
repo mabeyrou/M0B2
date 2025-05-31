@@ -31,11 +31,11 @@ class WebcamManager:
         self.last_results = None
 
     def __enter__(self):
-        self.start_camera()
+        self.start_cam()
         return self
     
-    def __exit__(self):
-        self.stop_camera()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop_cam()
     
     def start_cam(self) -> bool:
         with self.lock:

@@ -22,11 +22,11 @@ pip install -r requirement.tx
 ## Launch app
 ### Launch server
 ```bash
-uvicorn main:app --host 127.0.0.1 --port 9000 --reload
+cd back && uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 ### Launch streamlit
 ```bash
-streamlit run app.py
+cd front && streamlit run app.py
 ```
 ## TODO
 - [x] Optimiser les FPS pour communication avec l'API ( 5 FPS),
