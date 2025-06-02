@@ -2,7 +2,9 @@ import threading
 import cv2 as cv
 import torch
 from detection_service import DetectionService
+from description_service import DescriptionService
 from loguru import logger
+from PIL import Image
 
 class WebcamError(Exception):
     """Base class for webcam related exceptions."""
@@ -27,8 +29,10 @@ class WebcamManager:
         self.lock = threading.Lock()
         self.detection_service = DetectionService()
         self.detection_interval = detection_interval
+        self.description_service = DescriptionService()
         self.frame_count = 0
         self.last_results = None
+        self.current_frame = None
 
     def __enter__(self):
         self.start_cam()
@@ -74,6 +78,7 @@ class WebcamManager:
         
         with self.lock:
             success, frame = self.cap.read()
+            self.current_frame = frame
 
             if not success:
                 error = "Can't receive frame (stream end?). Exiting ..."
@@ -93,7 +98,6 @@ class WebcamManager:
 
             if self.last_results:
                 for result in self.last_results:
-                    logger.debug(result)
                     box = result['box']
                     label = result['label']
                     score = result['score']
@@ -110,6 +114,12 @@ class WebcamManager:
                 return buffer.tobytes()
             
         return None
+    
+    def get_snapshot(self):
+        image = Image.fromarray(self.current_frame)  
+        result = self.description_service.describe(image)
+        logger.debug(result)
+        return result
     
     def generate_frames(self):
         try:

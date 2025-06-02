@@ -41,7 +41,6 @@ async def stop_cam():
 @router.get('/stream')
 async def video_stream():
     try:
-        logger.debug('test')
         return StreamingResponse(manager.generate_frames(), 
                              media_type="multipart/x-mixed-replace; boundary=frame")
     
@@ -60,3 +59,7 @@ async def video_stream():
 @router.get('/status')
 async def get_cam_status():
     return {'is_active': manager.get_status()}
+
+@router.get('/description')
+async def get_snapshot_description():
+    return {'description': manager.get_snapshot()}
